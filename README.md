@@ -26,7 +26,8 @@ Install the dependencies and devDependencies and start the server.
 
 ```sh
 $ cd Justice
-$ npm install 
+$ npm install
+$ truffle migrate
 $ npm run dev
 ```
 
