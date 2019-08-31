@@ -55,8 +55,8 @@ contract VotingRoom {
         
     }
     
-    // SOON
-    function addVoter(uint roomId   ) public  returns (uint success) {
+    // add voter
+    function add_voter(uint roomId   ) public  returns (uint success) {
         
         // check if room exists , it will elimnate the program if it false tho .. no worries 
         if (room_exist(roomId) == false){
@@ -73,7 +73,8 @@ contract VotingRoom {
         return roomsStructs[roomId].VotersCount;
      }
     
-    function getVoter(uint roomId , uint voterId ) public view returns (address found) {
+    // get voter address
+    function get_voter(uint roomId , uint voterId ) public view returns (address found) {
         // check if room exists 
         if (room_exist(roomId) == false){
             revert("Room doesnt exists");
@@ -81,26 +82,32 @@ contract VotingRoom {
         
         // if we got the room right but the voterid wrong 
         
-        // if (check_voter(voter) == false){
-        //     // soon
-        // }
+        if (voter_exist(roomId , voterId) == false){
+            revert("Voter not Valid");
+            }
+        
         // get the voter from the room
         return roomsStructs[roomId].votersStructs[voterId].voterAddr;
 
     }
     
+    // check voter existence
+    function voter_exist (uint roomId , uint voterId) public view returns (bool exists){
+        
+        // we dont need to check this because we allready did in get_voter
+        // if ( room_exist(roomId) == false) {
+        //     revert("the room doesnt even exists")
+        // }
+        
+        if (voterId > roomsStructs[roomId].VotersCount - 1){
+            return false;
+        }
+        
+        return true;
+    }
+    
     
     
 
-    // just testing function
-    function test_str(uint id) public view returns (uint x)
-    {
-        bool checkRoom = room_exist(id);
-        if (checkRoom == true) {
-         return roomsStructs[id].roomId;   
-        }
-        else{
-            revert("Sorry");
-        }
-    }
+   
 }
