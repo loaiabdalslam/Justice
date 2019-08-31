@@ -4,17 +4,20 @@ contract VotingRoom {
 
     struct Voter
     {
-        uint VoterId;
+        uint voterId;
         address payable userAddr;
     }
 
-
     struct Room{
-        uint[] VotersCount;
+        // count for incermental id for voters 
+        uint VotersCount ;
         uint roomId;
         mapping(uint => Voter) votersStructs;
-        Voter player;
+        
     }
+    
+    // if there's zero rooms 
+    bool noRooms = true;
 
     mapping(uint => Room) roomsStructs;
     uint[] allrooms;
@@ -33,6 +36,7 @@ contract VotingRoom {
         // just to keep it  simple untill we do hash functions 
         countRooms ++ ;
         
+        noRooms = false;
         return countRooms;
     }
     
@@ -52,14 +56,32 @@ contract VotingRoom {
     }
     
     // SOON
-    // function addVoter(uint voterId , uint roomId   ) public returns (bool success) {
+    function addVoter(uint roomId   ) public  returns (uint success) {
         
+        // check if room exists , it will elimnate the program if it false tho .. no worries 
+        if (room_exist(roomId) == false){
+            revert("Room doesnt exists");
+        }
+        // add the voter id to the voterarry in the specific room , and
+        roomsStructs[roomId].votersStructs[roomId].voterId = roomsStructs[roomId].VotersCount;
+        // increase the voters count by 1
+        roomsStructs[roomId].VotersCount ++;
+        // just for depugging 
+        return roomsStructs[roomId].VotersCount;
+     }
+    
+    // function getVoter(uint roomId , uint voterId ) public view returns (bool found) {
+    //     // check if room exists 
+    //     if (room_exist(roomId) == false){
+    //         revert("Room doesnt exists");
+    //     }
         
+    //     // get the voter from the room
+        
+    //     // roomsStructs[roomId].VotersArray[voterId].voterId;
         
     // }
-    
-    
-    
+
     // just testing function
     function test_str(uint id) public view returns (uint x)
     {
