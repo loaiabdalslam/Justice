@@ -24,7 +24,7 @@ contract VotingRoom {
 
     //Create New Voting Channel
 
-    function newRoom() public returns(bool success)
+    function new_room() public returns(uint co)
     {
       
         roomsStructs[countRooms].roomId = countRooms;
@@ -33,11 +33,42 @@ contract VotingRoom {
         // just to keep it  simple untill we do hash functions 
         countRooms ++ ;
         
-        return true;
+        return countRooms;
     }
     
+    // checking for the room's existence 
+    function room_exist(uint roomId) public view returns (bool exists)  {
+        
+        // its simple because the id is just incermental 
+        // untill we do the hash and more complex logic we will modifi the logic..
+        
+        if ( roomId > countRooms - 1){
+            // Roomid input is larger than the counted rooms 
+            return false;
+        }
+        
+        return true;
+        
+    }
+    
+    // SOON
+    // function addVoter(uint voterId , uint roomId   ) public returns (bool success) {
+        
+        
+        
+    // }
+    
+    
+    
+    // just testing function
     function test_str(uint id) public view returns (uint x)
     {
-     return roomsStructs[id].roomId;   
+        bool checkRoom = room_exist(id);
+        if (checkRoom == true) {
+         return roomsStructs[id].roomId;   
+        }
+        else{
+            revert("Sorry");
+        }
     }
 }
