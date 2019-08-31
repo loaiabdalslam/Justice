@@ -5,7 +5,7 @@ contract VotingRoom {
     struct Voter
     {
         uint voterId;
-        address payable userAddr;
+        address payable voterAddr;
     }
 
     struct Room{
@@ -64,23 +64,33 @@ contract VotingRoom {
         }
         // add the voter id to the voterarry in the specific room , and
         roomsStructs[roomId].votersStructs[roomId].voterId = roomsStructs[roomId].VotersCount;
+        //add adress 
+        roomsStructs[roomId].votersStructs[roomId].voterAddr = msg.sender;
+
         // increase the voters count by 1
         roomsStructs[roomId].VotersCount ++;
         // just for depugging 
         return roomsStructs[roomId].VotersCount;
      }
     
-    // function getVoter(uint roomId , uint voterId ) public view returns (bool found) {
-    //     // check if room exists 
-    //     if (room_exist(roomId) == false){
-    //         revert("Room doesnt exists");
-    //     }
+    function getVoter(uint roomId , uint voterId ) public view returns (address found) {
+        // check if room exists 
+        if (room_exist(roomId) == false){
+            revert("Room doesnt exists");
+        }
         
-    //     // get the voter from the room
+        // if we got the room right but the voterid wrong 
         
-    //     // roomsStructs[roomId].VotersArray[voterId].voterId;
-        
-    // }
+        // if (check_voter(voter) == false){
+        //     // soon
+        // }
+        // get the voter from the room
+        return roomsStructs[roomId].votersStructs[voterId].voterAddr;
+
+    }
+    
+    
+    
 
     // just testing function
     function test_str(uint id) public view returns (uint x)
