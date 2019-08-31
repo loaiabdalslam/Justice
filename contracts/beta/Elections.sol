@@ -2,17 +2,39 @@ pragma solidity >=0.4.22 <0.6.0;
 
 contract VotingRoom {
 
+
+
     struct Voter
     {
+        // id 
         uint voterId;
+        //  account address
         address payable voterAddr;
+        
+        // voted or not
+        // solidity will assigin voted to false as default .. perfectly :) [0 is the default value in struct]
+        bool voted;
+        
+    }
+    
+    struct Candidate 
+    {
+        // id
+        uint candidateId;
+        // name
+        string name;
+        // votes 
+        uint votesCount;
     }
 
     struct Room{
         // count for incermental id for voters 
         uint VotersCount ;
+        
         uint roomId;
         mapping(uint => Voter) votersStructs;
+        // Candidate struct
+        mapping(uint => Candidate) candidateStructs;
         
     }
     
@@ -24,6 +46,32 @@ contract VotingRoom {
     
     //  to prevent duplication
     uint countRooms = 0;
+
+// Voting
+
+    function vote(uint roomId , uint voterId ) public view returns (bool success){
+        
+          if ( room_exist(roomId) == false) {
+            revert("the room doesnt exist");
+        }
+        
+        if (voter_exist(roomId,voterId) == false){
+            revert("Voter doesnt exist");
+        }
+        
+        return true;
+        // VOTING SOON
+        
+  
+    }
+
+// check candidate_exist
+    // function candidate_exist() public returns (bool exist) {
+        
+    //     // SOON
+        
+    // }
+
 
     //Create New Voting Channel
 
@@ -106,8 +154,5 @@ contract VotingRoom {
         return true;
     }
     
-    
-    
 
-   
 }
