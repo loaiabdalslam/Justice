@@ -22,22 +22,24 @@ contract VotingRoom {
         // id
         uint candidateId;
         // name
-        string name;
+        string candidateName;
         // votes 
-        uint votesCount;
+        uint  votesCount;
+        // roomId
+        uint roomId;
     }
 
     struct Room{
         // count for incermental id for voters 
         uint VotersCount ;
-        
+        uint candidatesCount;
         uint roomId;
         mapping(uint => Voter) votersStructs;
-        // Candidate struct
-        mapping(uint => Candidate) candidateStructs;
-        
+
     }
     
+    mapping(uint => Candidate) candidateStructs;
+
     // if there's zero rooms 
     bool noRooms = true;
 
@@ -47,30 +49,116 @@ contract VotingRoom {
     //  to prevent duplication
     uint countRooms = 0;
 
-// Voting
+// add candidate 
 
-    function vote(uint roomId , uint voterId ) public view returns (bool success){
+    function add_candidate (uint roomId , string memory candidateName  ) public  returns(bool success){
         
+         // check room existence
+          if ( room_exist(roomId) == false) {
+            revert("the room doesnt exist");
+        }
+        uint cc = roomsStructs[roomId].candidatesCount;
+        
+        candidateStructs[cc].candidateId = cc;
+        
+        candidateStructs[cc].candidateName = candidateName;
+        
+        roomsStructs[roomId].candidatesCount ++;
+        
+        return true;
+        
+    }
+    
+    
+    function get_candidate(uint roomId , uint candidateId) public view returns(string memory  name){
+         // check room existence
           if ( room_exist(roomId) == false) {
             revert("the room doesnt exist");
         }
         
-        if (voter_exist(roomId,voterId) == false){
-            revert("Voter doesnt exist");
+       if( candidate_exist(roomId , candidateId)== false ){
+           
+           revert("candidate is not valid sorry");
+       }
+     
+     uint cc = roomsStructs[roomId].candidatesCount;
+        for ( uint i = 0 ; i <= cc ; i++){
+            
+            if (candidateStructs[i].roomId == roomId){
+                return candidateStructs[i].candidateName;
+            }
+            else{
+                return "shit";
+            }
+        }
+        
+        
+    }
+    
+    // check candidate_exist
+    function candidate_exist( uint roomId,uint candidateId) public view returns (bool exist) {
+       
+       
+         uint cc = roomsStructs[roomId].candidatesCount;
+         
+         if (cc <= 0 ){
+             return false;
+         }
+        
+        if (candidateId > cc -1  )
+        {
+            return false;
         }
         
         return true;
-        // VOTING SOON
         
-  
+
+    }
+//  Voting
+
+    function vote(uint roomId , uint voterId , uint candidateId) public  returns (bool success){
+        
+        // check room existence
+          if ( room_exist(roomId) == false) {
+            revert("the room doesnt exist");
+        }
+        //check voted existence
+        if (voter_exist(roomId,voterId) == false){
+            revert("Voter doesnt exist");
+        }
+        // check if voted before
+        if (roomsStructs[roomId].votersStructs[voterId].voted == true){
+            revert("Voted Allready has voted before");
+        }
+        
+        // check candidates 
+        
+         if( candidate_exist(roomId , candidateId)== false ){
+           
+           revert("candidate is not valid sorry");
+       }
+     
+     
+        uint cc = roomsStructs[roomId].candidatesCount;
+        for ( uint i = 0 ; i <= cc ; i++){
+            
+            if (candidateStructs[i].roomId == roomId){
+                candidateStructs[candidateId].votesCount++;
+                }
+           
+        }   
+           
+        // check true 
+        roomsStructs[roomId].votersStructs[voterId].voted = true;
+        
+        // increase votes for the candidate
+        
+        // roomsStructs[roomId].candidateStructs[candidateId].votes ++;
+        
+        return false;
     }
 
-// check candidate_exist
-    // function candidate_exist() public returns (bool exist) {
-        
-    //     // SOON
-        
-    // }
+
 
 
     //Create New Voting Channel
@@ -93,6 +181,11 @@ contract VotingRoom {
         
         // its simple because the id is just incermental 
         // untill we do the hash and more complex logic we will modifi the logic..
+        
+        if (countRooms ==0){
+            return false;
+        }
+        
         
         if ( roomId > countRooms - 1){
             // Roomid input is larger than the counted rooms 
