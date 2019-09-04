@@ -24,7 +24,7 @@ contract VotingRoom {
         // roomId
         uint roomId;
         // id
-        uint candidateId;
+        address candidateAddr;
         // name
         string candidateName;
         // votes
@@ -33,12 +33,16 @@ contract VotingRoom {
 
   //add candidate
 
-    function add_candidate(uint roomId , uint candidateId , string memory candidateName) public returns(uint){
+    function add_candidate(uint roomId  , string memory candidateName) public returns(uint){
         // check
-        if (roomsArray[roomId].candidatesCount <= roomsArray[roomId].maxCan){
-
-
+        if (roomsArray[roomId].candidatesCount <= roomsArray[roomId].maxCan - 1 ){
+            
+            candidatesArray.push(Candidate(roomId , msg.sender , candidateName , 0 ));
+            roomsArray[roomId].candidatesEntred.push(msg.sender);
             roomsArray[roomId].candidatesCount++;
+        }
+        else{
+            revert("Sorry , Its Full Room");
         }
 
 
@@ -49,6 +53,8 @@ contract VotingRoom {
         // count for incermental id for voters
         uint roomId;
         uint VotersCount ;
+        
+        // candidatesEntred
         address [] candidatesEntred;
         address [] VotersEntred;
         uint maxCan;
@@ -56,8 +62,8 @@ contract VotingRoom {
 
     }
     Voter[]  votersArray;
-    Candidate [] candidatesArray;
-    Room[]   roomsArray;
+    Candidate[] public candidatesArray;
+    Room[]  public roomsArray;
     uint roomsCount;
 
 
@@ -67,7 +73,7 @@ contract VotingRoom {
         address[] memory voters ;
         address[] memory candidates;
         roomsArray.push(Room(roomsCount,0,candidates,voters,maxCan,0));
-
+        
         roomsCount++;
     }
 
@@ -84,15 +90,13 @@ contract VotingRoom {
 
         votersArray.push(voter);
         roomsArray[roomId].VotersEntred.push( msg.sender);
+        roomsArray[roomId].VotersCount++;
     }
 
     function get_room (uint roomId) public view returns (Room memory){
        return roomsArray[roomId];
-
-
-
     }
 
-
-
+    
+    
 }
