@@ -18,6 +18,37 @@ contract VotingRoom {
         bool voted;
 
     }
+    
+    function vote(uint roomId , address voterAddr , address candidateAddr) public returns (bool voted) {
+        
+        // check the voter is in the room by comparing the addresses 
+        
+        
+        for (uint i = 0 ; i <= roomsArray[roomId].VotersEntred.length ; i ++ ){
+            if ( votersArray[i].voted == true){
+                revert("Voter allready voted");
+            }
+              if (roomsArray[roomId].VotersEntred[i] == voterAddr){
+                  
+                  for (uint j = 0 ; j <= roomsArray[roomId].maxCan; j ++){
+                      
+                      if (candidatesArray[j].candidateAddr == candidateAddr){
+                          
+                          candidatesArray[j].votesCount ++;
+                          votersArray[i].voted == true;
+                          return true;
+                      }
+                     
+                  }
+                     revert("Candidate is not valid in this room");
+                }
+                else{
+                    revert("Voter is not valid in this room");
+                }
+        }
+        return false;
+    }
+    
 
     struct Candidate
     {
@@ -61,7 +92,7 @@ contract VotingRoom {
         uint candidatesCount;
 
     }
-    Voter[]  votersArray;
+    Voter[]  public votersArray;
     Candidate[] public candidatesArray;
     Room[]  public roomsArray;
     uint roomsCount;
@@ -76,6 +107,8 @@ contract VotingRoom {
         
         roomsCount++;
     }
+
+
 
 
     // add voter
@@ -93,8 +126,8 @@ contract VotingRoom {
         roomsArray[roomId].VotersCount++;
     }
 
-    function get_room (uint roomId) public view returns (Room memory){
-       return roomsArray[roomId];
+    function get_room () public view returns (uint){
+       return roomsArray.length;
     }
 
     
