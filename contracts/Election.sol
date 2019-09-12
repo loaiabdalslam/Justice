@@ -1,78 +1,157 @@
-pragma solidity ^0.5.8;
+pragma solidity >=0.4.22 <0.6.0;
+pragma experimental ABIEncoderV2;
 
-contract Election {
-
-
-	struct voter {
-		address id;
-		string nationalId;
-		string votingKey;
-		string votingPass;
-		bool vote;
-	}
-
-	struct candidate {
-		uint id;
-		string name;
-		uint voteCount;
-	}
-
-	mapping( uint => candidate) public candidates;
-	mapping( address => voter) public voters;
-
-	uint public votersCount;
-	uint public candidatesCount;
-
-	event votedEvent(
-		uint indexed _canidateId
-	);
+contract VotingRoom {
 
 
 
-	constructor() public {
+    struct Voter
+    {
 
-		addCandidates('Loai abdalslam');
-		addCandidates('Mohamed abdalslam');
-		addCandidates('Mohamed Ahmed');
-		addCandidates('Mohamed Salam');
+        address payable voterAddr;
 
-/*
-		addVoters({from:'0xE2Eb60Dc54935Ae625cd58FEf42821795da09353'},'xxxx1','xxxx1','$$$$1');
-		addVoters({from:'0x360B6740D7778bbA82F1D81B5eeAEacF71C023A5'},'xxxx2','xxxx2','$$$$2');
-*/
-	}
+        // roomsEntred contains id's of rooms
+        uint[] roomsEntred;
 
-	function addCandidates(string memory _name) private {
+        // voted or not
+        // solidity will assigin voted to false as default .. perfectly :) [0 is the default value in struct]
+        bool voted;
 
-	candidatesCount++;
+    }
+    
+    function vote(uint roomId , address voterAddr , address candidateAddr) public returns (bool voted) {
+        
+        // check the voter is in the room by comparing the addresses 
+        
+        
+        for (uint i = 0 ; i <= roomsArray[roomId].VotersEntred.length ; i ++ ){
+            if ( votersArray[i].voted == true){
+                revert("Voter allready voted");
+            }
+              if (roomsArray[roomId].VotersEntred[i] == voterAddr){
+                  
+                  for (uint j = 0 ; j <= roomsArray[roomId].maxCan; j ++){
+                      
+                      if (candidatesArray[j].candidateAddr == candidateAddr){
+                          
+                          candidatesArray[j].votesCount ++;
+                          votersArray[i].voted == true;
+                          return true;
+                      }
+                     
+                  }
+                     revert("Candidate is not valid in this room");
+                }
+                else{
+                    revert("Voter is not valid in this room");
+                }
+        }
+        return false;
+    }
+    
 
-	candidates[candidatesCount] = candidate(candidatesCount,_name,0);
+    struct Candidate
+    {
+        // roomId
+        uint roomId;
+        // id
+        address candidateAddr;
+        // name
+        string candidateName;
+        // votes
+        uint  votesCount;
+    }
 
-	}
+// get candidate info
+    // function get_candidate (address candidateAddr , uint roomId) public returns(uint roomId , address , string , uint){
+        
+    // }
+  //add candidate
 
-	function addVoters(string memory  _nationalId,string memory _votingKey,string memory _votingPass) private {
-	votersCount++;
-	bool vote = false;
-
-	voters[msg.sender] = voter(msg.sender,_nationalId,_votingKey,_votingPass,vote);
-
-	}
-
-
-	function vote(string memory  _nationalId,string memory _votingKey,string memory _votingPass,uint _canidateId) public {
-		addVoters(_nationalId,_votingKey,_votingPass);
-
-		require(voters[msg.sender].id == msg.sender);
-		require(voters[msg.sender].vote != true);	
-		require(_canidateId > 0 && _canidateId <= candidatesCount);
-
-		voters[msg.sender].vote = true;
-
-		candidates[_canidateId].voteCount ++;
-
-		emit votedEvent(_canidateId);
-	}
+    function add_candidate(uint roomId  , string memory candidateName) public returns(uint){
+        // check
+        
+         
+        Room storage room = roomsArray[roomId];
+        
+        if (room.candidates[msg.sender].candidateAddr == msg.sender ){
+            revert ("EROOORRRR");
+        }
+        if (room.candidatesCount <= roomsArray[roomId].maxCan - 1 ){
+            room.candidates[msg.sender] = Candidate(roomId,msg.sender,candidateName , 0);
+            candidatesArray.push(Candidate(roomId , msg.sender , candidateName , 0 ));
+            room.candidatesEntred.push(msg.sender);
+            room.candidatesCount++;
+        }
+        else{
+            revert("Sorry , Its Full Room");
+        }
 
 
+    }
 
+
+    struct Room{
+        // count for incermental id for voters
+        uint roomId;
+        uint VotersCount ;
+        
+        // candidatesEntred
+        address [] candidatesEntred;
+        address [] VotersEntred;
+        uint maxCan;
+        mapping (address => Candidate)  candidates;
+        uint candidatesCount;
+
+    }
+    Voter[]  public votersArray;
+    Candidate[] public candidatesArray;
+    Room[]   roomsArray;
+    uint roomsCount;
+
+//get room 
+
+   function get_room (uint roomId) public view returns (uint , uint , address[] memory , address[] memory, uint , uint){
+       Room memory room = roomsArray[roomId];
+       return (room.roomId , room.VotersCount , room.candidatesEntred , room.VotersEntred,room.maxCan,room.candidatesCount);
+    }
+
+    
+    
+
+    //! Solved : Bug at add_room fucntion !  (Copying of type struct VotingRoom.Candidate memory[] memory to storage not yet supported.)
+    function add_room (uint maxCan) public {
+
+        address[] memory voters ;
+        address[] memory candidates;
+        roomsArray.push(Room(roomsCount,0,candidates,voters,maxCan,0));
+        
+        roomsCount++;
+    }
+// 
+    function test (uint roomId) public view returns (Candidate memory ca) {
+        Room storage room = roomsArray[roomId];
+        
+        return room.candidates[msg.sender];
+    }
+
+
+
+    // add voter
+    function
+    add_voter(uint roomId )
+    public {
+        
+        // this we can use to support multible rooms for each voter somehow.
+        uint[] memory roomsEntred;
+
+        // Make instance of voter to push it to votersArray
+        Voter memory voter =  Voter(msg.sender,roomsEntred , false) ;
+        
+        votersArray.push(voter);
+        roomsArray[roomId].VotersEntred.push( msg.sender);
+        roomsArray[roomId].VotersCount++;
+    }
+
+ 
 }
