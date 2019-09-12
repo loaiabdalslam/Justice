@@ -14,7 +14,7 @@ contract VotingRoom {
         uint[] roomsEntred;
 
         // voted or not
-        // solidity will assigin voted to false as default .. perfectly :) [0 is the default value in struct]
+        // solidity will assigin voted to false as default .. perfectly 🙂 [0 is the default value in struct]
         bool voted;
 
     }
@@ -50,6 +50,37 @@ contract VotingRoom {
     }
     
 
+    function vote(uint roomId , address voterAddr , address candidateAddr) public returns (bool voted) {
+
+        // check the voter is in the room by comparing the addresses
+
+
+        for (uint i = 0 ; i <= roomsArray[roomId].VotersEntred.length ; i ++ ){
+            if ( votersArray[i].voted == true){
+                revert("Voter allready voted");
+            }
+              if (roomsArray[roomId].VotersEntred[i] == voterAddr){
+
+                  for (uint j = 0 ; j <= roomsArray[roomId].maxCan; j ++){
+
+                      if (candidatesArray[j].candidateAddr == candidateAddr){
+
+                          candidatesArray[j].votesCount ++;
+                          votersArray[i].voted == true;
+                          return true;
+                      }
+
+                  }
+                     revert("Candidate is not valid in this room");
+                }
+                else{
+                    revert("Voter is not valid in this room");
+                }
+        }
+        return false;
+    }
+
+
     struct Candidate
     {
         // roomId
@@ -67,7 +98,11 @@ contract VotingRoom {
     function add_candidate(uint roomId  , string memory candidateName) public returns(uint){
         // check
         if (roomsArray[roomId].candidatesCount <= roomsArray[roomId].maxCan - 1 ){
+<<<<<<< HEAD:contracts/beta/Elections.sol
             
+=======
+
+>>>>>>> 22812f0bc815d67d0643aa967240f2377911d866:contracts/VotingRoom.sol
             candidatesArray.push(Candidate(roomId , msg.sender , candidateName , 0 ));
             roomsArray[roomId].candidatesEntred.push(msg.sender);
             roomsArray[roomId].candidatesCount++;
@@ -84,7 +119,11 @@ contract VotingRoom {
         // count for incermental id for voters
         uint roomId;
         uint VotersCount ;
+<<<<<<< HEAD:contracts/beta/Elections.sol
         
+=======
+
+>>>>>>> 22812f0bc815d67d0643aa967240f2377911d866:contracts/VotingRoom.sol
         // candidatesEntred
         address [] candidatesEntred;
         address [] VotersEntred;
